@@ -14,12 +14,16 @@ fn bindgen_vncserver() {
     println!("cargo:rustc-link-search={}", lib_path.display());
     println!("cargo:rustc-link-lib=dylib=vncserver");
 
-    let header = format!(
-        "{}/rfb/rfb.h",
-        libvncserver.include_paths[0].to_str().unwrap(),
-    );
+    let header_file = match env::var("LIBVNCSERVER_HEADER_FILE") {
+        Ok(header_file) => header_file,
+        Err(_) => format!(
+            "{}/rfb/rfb.h",
+            libvncserver.include_paths[0].to_str().unwrap(),
+        ),
+    };
+
     let bindings = bindgen::Builder::default()
-        .header(header)
+        .header(header_file)
         .generate()
         .expect("unable to generate rfb bindings");
 
